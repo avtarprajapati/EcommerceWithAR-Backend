@@ -8,7 +8,7 @@ route.param('id', productController.checkID);
 route
   .route('/')
   .get(productController.getAllProducts)
-  .post(productController.checkBody, productController.createProduct);
+  .post(productController.createProduct);
 
 route.route('/:id').get(productController.getProduct);
 

@@ -1,7 +1,7 @@
 const express = require('express');
-const productRoute = require('./routes/productRoutes');
-const cartRoute = require('./routes/cartRoutes');
-const userRoute = require('./routes/userRoutes');
+const productsRoute = require('./routes/productRoutes');
+const cartsRoute = require('./routes/cartRoutes');
+const usersRoute = require('./routes/userRoutes');
 const morgan = require('morgan');
 const cors = require('cors');
 const app = express();
@@ -19,8 +19,8 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use('/api/v1/user', userRoute);
-app.use('/api/v1/product', productRoute);
-app.use('/api/v1/cart', cartRoute);
+app.use('/api/v1/users', usersRoute);
+app.use('/api/v1/products', productsRoute);
+app.use('/api/v1/carts', cartsRoute);
 
 module.exports = app;

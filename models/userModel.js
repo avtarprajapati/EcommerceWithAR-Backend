@@ -32,15 +32,12 @@ exports.createUser = async (userData) => {
   }
 };
 
-exports.getUser = async (id) => {
+exports.getUser = async (profileId) => {
   const client = mongoConnect();
   try {
     await client.connect();
     const db = client.db(mongoDbName);
-    const cursor = await db
-      .collection('User')
-      .find({ profileId: id })
-      .toArray();
+    const cursor = await db.collection('User').find({ profileId }).toArray();
 
     if (!cursor.length) throw new Error('not any users');
 

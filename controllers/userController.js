@@ -38,8 +38,9 @@ exports.getAllUser = async (req, res) => {
 
 exports.getUser = async (req, res) => {
   try {
-    const { id } = req.body;
-    const cursor = await userModel.getUser(id);
+    const { profileId } = req.query;
+
+    const cursor = await userModel.getUser(profileId);
 
     res.status(200).json({
       status: 'success',
