@@ -74,3 +74,22 @@ exports.getProduct = async (req, res) => {
     });
   }
 };
+
+exports.deleteProduct = async (req, res) => {
+  try {
+    const { id } = req.params;
+    console.log(id);
+    const cursor = await productModel.deleteProduct(id);
+    res.status(204).json({
+      status: 'success',
+      requestedAt: req.requestTime,
+      data: cursor,
+    });
+  } catch (error) {
+    res.status(500).json({
+      status: 'fail',
+      requestedAt: req.requestTime,
+      error: error,
+    });
+  }
+};

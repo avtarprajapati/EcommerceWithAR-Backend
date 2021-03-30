@@ -47,3 +47,20 @@ exports.getProduct = async (id) => {
     client.close();
   }
 };
+
+exports.deleteProduct = async (id) => {
+  const client = mongoConnect();
+  try {
+    await client.connect();
+    const db = client.db(mongoDbName);
+    const cursor = await db
+      .collection('Products')
+      .deleteOne({ _id: ObjectId(id) });
+
+    return id;
+  } catch (error) {
+    return error;
+  } finally {
+    client.close();
+  }
+};
