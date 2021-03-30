@@ -7,6 +7,10 @@
     "dev": "nodemon server.js",
     "start": "node server.js"
   },
+  "engines": {
+    "node": "^14.15.3",
+    "npm": "^6.14.9"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/avtarprajapati/-EcommerceWithAR-Backend.git"
@@ -21,9 +25,8 @@
     "cors": "^2.8.5",
     "express": "^4.17.1",
     "mongodb": "^3.6.4",
-    "morgan": "^1.10.0"
-  },
-  "devDependencies": {
+    "morgan": "^1.10.0",
     "dotenv": "^8.2.0"
-  }
+  },
+  "devDependencies": {}
 }
