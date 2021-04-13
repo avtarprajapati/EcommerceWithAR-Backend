@@ -1,12 +1,20 @@
-exports.getCartByUser = (req, res) => {
-  res.json({
-    data: { id: '5', totalPrice: 500 },
-  });
-};
+const cartModel = require('../models/cartModel');
 
-exports.addToCarts = (req, res) => {
-  console.log(req.params);
-  res.json({
-    data: { id: '5', totalPrice: 500 },
-  });
+exports.getCartByUser = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const resData = await cartModel.getCartDetails(userId);
+
+    res.status(200).json({
+      status: 'success',
+      requestedAt: req.requestTime,
+      data: resData,
+    });
+  } catch (error) {
+    res.status(500).json({
+      status: 'fail',
+      requestedAt: req.requestTime,
+      error: error,
+    });
+  }
 };

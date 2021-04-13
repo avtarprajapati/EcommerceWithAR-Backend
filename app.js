@@ -1,7 +1,8 @@
 const express = require('express');
-const productsRoute = require('./routes/productRoutes');
-const cartsRoute = require('./routes/cartRoutes');
-const usersRoute = require('./routes/userRoutes');
+const productsRouter = require('./routes/productRoutes');
+const cartsRouter = require('./routes/cartRoutes');
+const usersRouter = require('./routes/userRoutes');
+const bookingRouter = require('./routes/bookingRoutes');
 const morgan = require('morgan');
 const cors = require('cors');
 const app = express();
@@ -19,8 +20,11 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use('/api/v1/users', usersRoute);
-app.use('/api/v1/products', productsRoute);
-app.use('/api/v1/carts', cartsRoute);
+// node-cron job scheduling
+
+app.use('/api/v1/users', usersRouter);
+app.use('/api/v1/products', productsRouter);
+app.use('/api/v1/carts', cartsRouter);
+app.use('/api/v1/booking', bookingRouter);
 
 module.exports = app;

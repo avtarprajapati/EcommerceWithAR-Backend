@@ -1,5 +1,6 @@
 const { mongoConnect, mongoDbName } = require('../mongoConnection');
 const ObjectId = require('mongodb').ObjectId;
+
 exports.getAllProduct = async () => {
   const client = mongoConnect();
   try {
