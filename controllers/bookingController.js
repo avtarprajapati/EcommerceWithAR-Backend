@@ -1,0 +1,136 @@
+const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+
+const userModel = require('../models/userModel');
+const cartModel = require('../models/cartModel');
+const bookingModel = require('../models/bookingModel');
+const { ObjectId } = require('bson');
+
+exports.checkoutSession = async (req, res) => {
+  try {
+    // 1) Get the current user cart products
+    const userCartQty = req.body;
+
+    const { userId } = req.params;
+
+    const resData = await cartModel.getCartDetails(userId);
+    const customerEmailId = resData[0].email;
+
+    const productItems = resData[0].cartsData;
+
+    // check product id match with productItems get current quantity &
+    // arrange quantity data same as productItem
+    const productsQty = productItems.map(
+      (item) => userCartQty.find((cart) => cart.productId === item._id).quantity
+    );
+
+    const checkoutData = productItems.map((item, index) => {
+      const amount = item.price;
+      const name = item.title;
+      delete item._id;
+      delete item.type;
+      delete item.title;
+      delete item.imageUrl;
+      delete item.price;
+      return {
+        ...item,
+        name,
+        quantity: productsQty[index].quantity,
+        currency: 'INR',
+        amount: amount * 100 * productsQty[index].quantity,
+      };
+    });
+
+    // 2) create checkout session
+    const session = await stripe.checkout.sessions.create({
+      payment_method_types: ['card'],
+      success_url: `${process.env.API}/shop`,
+      cancel_url: `${process.env.API}/carts`,
+      customer_email: customerEmailId,
+      client_reference_id: userId,
+      line_items: checkoutData,
+    });
+
+    // empty cart of user
+    await userModel.updateUserData(userId, { carts: [] });
+
+    // const productData = session.line_items.map((item) => ({
+    //   productName: item.name,
+    //   quantity: item.quantity,
+    // }));
+
+    // const totalPrice = session.line_items.reduce(
+    //   (acc, cur) => acc.amount + cur.amount,
+    //   0
+    // );
+
+    // const insertData = {
+    //   userId: session.client_reference_id,
+    //   userEmail: session.customer_email,
+    //   paymentId: session.payment_intent,
+    //   productItem: productData,
+    //   totalPrice,
+    //   paid: true,
+    // };
+
+    // await bookingModel.createBooking(insertData);
+
+    // 3) create session as response
+    res.status(200).json({
+      status: 'success',
+      session,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      status: 'fail',
+      requestedAt: req.requestTime,
+      error: error,
+    });
+  }
+};
+
+const createBookingCheckout = async (session) => {
+  console.log(session);
+
+  const productData = session.line_item_group.line_items.map((item) => ({
+    productName: item.name,
+    quantity: item.quantity,
+  }));
+
+  const totalPrice = session.line_items.reduce(
+    (acc, cur) => acc.amount + cur.amount,
+    0
+  );
+
+  const insertData = {
+    userId: session.client_reference_id,
+    userEmail: session.customer_email,
+    paymentId: session.payment_intent,
+    productItem: productData,
+    totalPrice,
+    paid: true,
+  };
+
+  await bookingModel.createBooking(insertData);
+};
+
+exports.webhookCheckout = (req, res, next) => {
+  const signature = req.headers['stripe-signature'];
+  let event;
+  try {
+    event = stripe.webhooks.constructEvent(
+      req.body,
+      signature,
+      process.env.STRIPE_WEBHOOL_SCRETE
+    );
+  } catch (error) {
+    console.log(error);
+    return res.status(400).send(`Webhook error: ${error.message}`);
+  }
+
+  if (event.type === 'checkout.session.completed') {
+    createBookingCheckout(event.data.object);
+  }
+
+  res.status(200).json({ received: true });
+};

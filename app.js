@@ -3,6 +3,7 @@ const productsRouter = require('./routes/productRoutes');
 const cartsRouter = require('./routes/cartRoutes');
 const usersRouter = require('./routes/userRoutes');
 const bookingRouter = require('./routes/bookingRoutes');
+const bookingController = require('./controllers/bookingController');
 const morgan = require('morgan');
 const cors = require('cors');
 const app = express();
@@ -12,6 +13,12 @@ app.use(cors());
 if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'));
 }
+
+app.post(
+  '/api/v1/webhook-checkout',
+  express.raw({ type: 'application/json' }),
+  bookingController.webhookCheckout
+);
 
 app.use(express.json());
 
