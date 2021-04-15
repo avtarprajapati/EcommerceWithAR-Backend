@@ -50,6 +50,8 @@ exports.checkoutSession = async (req, res) => {
       };
     });
 
+    // console.log({ userCartQty, productItems, checkoutData });
+
     // 2) create checkout session
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
@@ -60,29 +62,35 @@ exports.checkoutSession = async (req, res) => {
       line_items: checkoutData,
     });
 
-    // empty cart of user
-    await userModel.updateUserData(userId, { carts: [] });
+    console.log(session);
 
     // const productData = session.line_items.map((item) => ({
     //   productName: item.name,
     //   quantity: item.quantity,
     // }));
 
-    // const totalPrice = session.line_items.reduce(
-    //   (acc, cur) => acc.amount + cur.amount,
-    //   0
-    // );
+    const totalPrice = checkoutData.reduce(
+      (acc, cur) => acc.amount + cur.amount,
+      0
+    );
 
-    // const insertData = {
-    //   userId: session.client_reference_id,
-    //   userEmail: session.customer_email,
-    //   paymentId: session.payment_intent,
-    //   productItem: productData,
-    //   totalPrice,
-    //   paid: true,
-    // };
+    console.log(totalPrice);
 
-    // await bookingModel.createBooking(insertData);
+    const insertData = {
+      userId: session.client_reference_id,
+      userEmail: session.customer_email,
+      paymentId: session.payment_intent,
+      // productItem: productData,
+      productItems: userCartQty,
+      totalPrice: totalPrice / 100,
+      paid: true,
+    };
+
+    // insert booking data
+    await bookingModel.createBooking(insertData);
+
+    // empty cart of user
+    await userModel.updateUserData(userId, { carts: [] });
 
     // 3) create session as response
     res.status(200).json({
@@ -143,4 +151,24 @@ exports.webhookCheckout = (req, res, next) => {
   }
 
   res.status(200).json({ received: true });
+};
+
+exports.getUserBooking = async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    const resData = await bookingModel.getUserBookingProduct(userId);
+
+    res.status(200).json({
+      status: 'success',
+      data: resData,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      status: 'fail',
+      requestedAt: req.requestTime,
+      error: error,
+    });
+  }
 };
