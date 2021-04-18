@@ -62,19 +62,11 @@ exports.checkoutSession = async (req, res) => {
       line_items: checkoutData,
     });
 
-    console.log(session);
+    const prices = checkoutData.map((item) => item.amount);
 
-    // const productData = session.line_items.map((item) => ({
-    //   productName: item.name,
-    //   quantity: item.quantity,
-    // }));
-
-    const totalPrice = checkoutData.reduce(
-      (acc, cur) => acc.amount + cur.amount,
-      0
-    );
-
-    console.log(totalPrice);
+    const totalPrice = prices.reduce((acc, cur) => {
+      return acc + cur;
+    }, 0);
 
     const insertData = {
       userId: session.client_reference_id,
@@ -95,7 +87,7 @@ exports.checkoutSession = async (req, res) => {
     // 3) create session as response
     res.status(200).json({
       status: 'success',
-      session,
+      id: session.id,
     });
   } catch (error) {
     console.log(error);

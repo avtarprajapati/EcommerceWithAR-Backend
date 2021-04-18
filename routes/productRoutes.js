@@ -13,6 +13,7 @@ route
 route
   .route('/:id')
   .get(productController.getProduct)
+  .patch(productController.patchProduct)
   .delete(productController.deleteProduct);
 
 module.exports = route;

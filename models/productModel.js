@@ -65,3 +65,21 @@ exports.deleteProduct = async (id) => {
     client.close();
   }
 };
+
+exports.updateProduct = async ({ id, data }) => {
+  const client = mongoConnect();
+  try {
+    await client.connect();
+    const db = client.db(mongoDbName);
+    // upsert is for when no data match it insert into
+    const cursor = await db
+      .collection('Products')
+      .updateOne({ _id: ObjectId(id) }, { $set: data });
+
+    return cursor.modifiedCount;
+  } catch (error) {
+    return error;
+  } finally {
+    client.close();
+  }
+};

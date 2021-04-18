@@ -25,7 +25,7 @@ exports.getUserBookingProduct = async (userId) => {
 
     const cursor = await db.collection('Booking').find({ userId }).toArray();
 
-    if (!cursor.length) throw new Error('not any product booked by user');
+    if (!cursor.length) return [];
 
     const productIds = cursor[0].productItems.map((item) =>
       ObjectId(item.productId)
