@@ -5,6 +5,7 @@ const route = express.Router();
 
 // route.param('id', userController.checkID);
 
+route.route('/allCount').get(userController.allCount);
 route.route('/').get(userController.getAllUser).post(userController.createUser);
 route
   .route('/:id')

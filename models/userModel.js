@@ -71,3 +71,34 @@ exports.updateUserData = async (id, updateData) => {
     client.close();
   }
 };
+
+exports.allCountDetails = async () => {
+  const client = mongoConnect();
+  try {
+    await client.connect();
+    const db = client.db(mongoDbName);
+
+    const userCount = await db.collection('User').find({}).count();
+    const productCount = await db.collection('Products').find({}).count();
+    const bookingCount = await db.collection('Booking').find({}).count();
+
+    return {
+      user: {
+        label: 'Total Users',
+        count: userCount,
+      },
+      product: {
+        label: 'Total Product',
+        count: productCount,
+      },
+      booking: {
+        label: 'Total Booking',
+        count: bookingCount,
+      },
+    };
+  } catch (error) {
+    return error;
+  } finally {
+    client.close();
+  }
+};

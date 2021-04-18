@@ -66,7 +66,25 @@ exports.updateUser = async (req, res) => {
     res.status(200).json({
       status: 'success',
       requestedAt: req.requestTime,
-      data: [],
+      data: cursor,
+    });
+  } catch (error) {
+    res.status(500).json({
+      status: 'fail',
+      requestedAt: req.requestTime,
+      error: error,
+    });
+  }
+};
+
+exports.allCount = async (req, res) => {
+  try {
+    const cursor = await userModel.allCountDetails();
+
+    res.status(200).json({
+      status: 'success',
+      requestedAt: req.requestTime,
+      data: cursor,
     });
   } catch (error) {
     res.status(500).json({
