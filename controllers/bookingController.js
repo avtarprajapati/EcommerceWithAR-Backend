@@ -16,22 +16,6 @@ exports.checkoutSession = async (req, res) => {
     const customerEmailId = resData[0].email;
 
     const productItems = resData[0].cartsData;
-    // console.log(userId, userCartQty, productItems);
-
-    // check product id match with productItems get current quantity &
-    // arrange quantity data same as productItem
-    // console.log(ObjectId(userCartQty[0].productId) === productItems[0]._id);
-    // const productsQty = productItems.map((item) => {
-    //   const findItem = userCartQty.find(
-    //     (cart) => ObjectId(cart.productId) === item._id
-    //   );
-    //   console.log(findItem);
-    //   if (findItem) {
-    //     return item.quantity;
-    //   }
-    // });
-
-    // console.log(productsQty, productItems);
 
     const checkoutData = productItems.map((item, index) => {
       const amount = item.price;
@@ -46,7 +30,7 @@ exports.checkoutSession = async (req, res) => {
         name,
         quantity: userCartQty[index].quantity,
         currency: 'INR',
-        amount: amount * 100 * userCartQty[index].quantity,
+        amount: amount * 100,
       };
     });
 
