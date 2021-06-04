@@ -24,16 +24,23 @@ exports.getUserBookingProduct = async (userId) => {
     const db = client.db(mongoDbName);
 
     const cursor = await db.collection('Booking').find({ userId }).toArray();
+    console.log(cursor);
 
     if (!cursor.length) return [];
 
-    const productIds = cursor[0].productItems.map((item) =>
-      ObjectId(item.productId)
-    );
+    // 1st time user buy product
+    // const productIds = cursor[0].productItems.map((item) =>
+    //   ObjectId(item.productId)
+    // );
+
+    const allProductIds = cursor.flatMap((time) => {
+      console.log(time);
+      return time.productItems.map((item) => ObjectId(item.productId));
+    });
 
     const productData = await db
       .collection('Products')
-      .find({ _id: { $in: productIds } })
+      .find({ _id: { $in: allProductIds } })
       .toArray();
 
     return productData;
